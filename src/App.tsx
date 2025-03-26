@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Posts from './components/Posts';
 import CreatePost from './components/CreatePost';
 import Filters from './components/Filters';
+import EmotionDiary from './components/EmotionDiary';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -88,9 +89,10 @@ const MainContent = styled.div`
   gap: 40px;
   margin-left: 80px;
   padding: 20px 40px;
-  max-width: 1400px;
   margin: 60px auto 0;
   width: calc(100% - 80px);
+  height: calc(100vh - 80px);
+  overflow-y: scroll;
 `;
 
 const Header = styled.div`
@@ -150,9 +152,9 @@ const CreateButton = styled.button`
   }
 `;
 
-const App: React.FC = () => {
+function App() {
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('posts');
+  const [activeSection, setActiveSection] = useState('diary');
 
   const handleCreatePost = (post: any) => {
     console.log('New post:', post);
@@ -160,6 +162,26 @@ const App: React.FC = () => {
 
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
+  };
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'diary':
+        return <EmotionDiary />;
+      case 'posts':
+        return (
+          <>
+            <ContentArea>
+              <Posts />
+            </ContentArea>
+            <FiltersArea>
+              <Filters onFilterChange={(filters) => console.log('Filters:', filters)} />
+            </FiltersArea>
+          </>
+        );
+      default:
+        return <div>Sección en construcción</div>;
+    }
   };
 
   return (
@@ -209,21 +231,18 @@ const App: React.FC = () => {
       </Sidebar>
 
       <Header>
-        {activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
+        {activeSection === 'diary' ? 'Diario de emociones' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
       </Header>
       
       <MainContent>
-        <ContentArea>
-          <Posts />
-        </ContentArea>
-        <FiltersArea>
-          <Filters onFilterChange={(filters) => console.log('Filters:', filters)} />
-        </FiltersArea>
+        {renderContent()}
       </MainContent>
 
-      <CreateButton onClick={() => setIsCreatePostOpen(true)}>
-        <i className="fi fi-rr-plus"></i>
-      </CreateButton>
+      {activeSection === 'posts' && (
+        <CreateButton onClick={() => setIsCreatePostOpen(true)}>
+          <i className="fi fi-rr-plus"></i>
+        </CreateButton>
+      )}
 
       <CreatePost
         isOpen={isCreatePostOpen}
@@ -232,6 +251,6 @@ const App: React.FC = () => {
       />
     </AppContainer>
   );
-};
+}
 
 export default App;
